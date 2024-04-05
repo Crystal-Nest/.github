@@ -1,7 +1,9 @@
-# <div style="display: flex; align-items: center;"><img src="https://github.com/Crystal-Nest/.github/assets/65339023/c7d34a20-8ffe-44ea-b3a9-77e964aebdd2" style="width: 64px;"><span>Crystal Nest</span></div>
+# Crystal Nest
 
-🙋‍♀️ A short introduction - what is your organization all about?  
-🌈 Contribution guidelines - how can the community get involved?  
-👩‍💻 Useful resources - where can the community find your docs? Is there anything else the community should know?  
-🍿 Fun facts - what does your team eat for breakfast?  
-🧙 Remember, you can do mighty things with the power of [Markdown](https://docs.github.com/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
+Intro
+
+Useful resources
+
+<img alt="Crystal Nest Website" src="https://raw.githubusercontent.com/crystal-nest/mod-fancy-assets/main/crystal-nest/pic512.png" width="13.91%"> <img alt="Twitch" src="https://raw.githubusercontent.com/crystal-nest/mod-fancy-assets/main/twitch/twitch512.png" width="13.91%"> <img alt="Patreon" src="https://raw.githubusercontent.com/crystal-nest/mod-fancy-assets/main/patreon/patreon512.png" width="13.91%"> <img alt="Ko-fi" src="https://raw.githubusercontent.com/crystal-nest/mod-fancy-assets/main/kofi/kofi512.png" width="13.91%"> <img alt="Our other projects" src="https://raw.githubusercontent.com/crystal-nest/mod-fancy-assets/main/github/github512.png" width="13.91%"> <img alt="Modrinth" src="https://raw.githubusercontent.com/crystal-nest/mod-fancy-assets/main/modrinth/modrinth512.png" width="13.91%"> <img alt="CurseForge" src="https://raw.githubusercontent.com/crystal-nest/mod-fancy-assets/main/curseforge/curseforge512.png" width="13.91%">
+
+[![Bisect Hosting](https://www.bisecthosting.com/partners/custom-banners/d559b544-474c-4109-b861-1b2e6ca6026a.webp "Bisect Hosting")](https://bisecthosting.com/crystalspider)
