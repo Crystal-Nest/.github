@@ -1,0 +1,100 @@
+name: Manual Single Release Workflow
+
+on:
+  workflow_dispatch:
+     inputs:
+      loader_forge:
+        type: boolean
+        description: Forge Loader
+        default: false
+      loader_fabric:
+        type: boolean
+        description: Fabric Loader
+        default: false
+      loader_neoforge:
+        type: boolean
+        description: NeoForge Loader
+        default: false
+      loader_common:
+        type: boolean
+        description: Common Loader
+        default: false
+      platform_maven:
+        type: boolean
+        description: Publish to Maven
+        default: false
+      platform_github:
+        type: boolean
+        description: Publish to GitHub
+        default: false
+      platform_curseforge:
+        type: boolean
+        description: Publish to CurseForge
+        default: false
+      platform_modrinth:
+        type: boolean
+        description: Publish to Modrinth
+        default: false 
+
+jobs:
+  single_release:
+    permissions: 
+      contents: write
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+      CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: 17
+        distribution: 'zulu' # Alternative distribution options are available
+
+    - name: Cache Gradle packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+        restore-keys: ${{ runner.os }}-gradle
+    
+    - name: Set permission
+      run: chmod +x ./gradlew
+      
+    - name: Build
+      run: |
+        ./gradlew wrapper --gradle-version 8.3
+        ./gradlew build 
+        
+    - name: Set Command
+      run: |
+          loaders=()
+          if [ "${{ github.event.inputs.loader_forge }}" == "true" ]; then
+            loaders+=("forge")
+          fi
+          if [ "${{ github.event.inputs.loader_fabric }}" == "true" ]; then
+            loaders+=("fabric")
+          fi
+          if [ "${{ github.event.inputs.loader_neoforge }}" == "true" ]; then
+            loaders+=("neoforge")
+          fi
+          if [ "${{ github.event.inputs.loader_common }}" == "true" ]; then
+            loaders+=("common")
+          fi
+          for loader in "${loaders[@]}"; do
+            if [ "${{ github.event.inputs.platform_maven }}" == "true" ]; then
+              ./gradlew ${loader}:publish
+            fi
+            if [ "${{ github.event.inputs.platform_github }}" == "true" ]; then
+              ./gradlew ${loader}:githubRelease
+            fi
+            if [ "${{ github.event.inputs.platform_curseforge }}" == "true" ]; then
+              ./gradlew ${loader}:curseforge
+            fi
+            if [ "${{ github.event.inputs.platform_modrinth }}" == "true" ]; then
+              ./gradlew ${loader}:modrinth
+            fi
+          done
