@@ -1,0 +1,12 @@
+{
+    "name": "Inactive Issues Organization Workflow",
+    "description": "Close inactive issues.",
+    "categories": [
+        "Caristal NEST"
+    ],
+    "filePatterns": [
+        "package.json$",
+        "^Dockerfile",
+        ".*\\.md$"
+    ]
+}
