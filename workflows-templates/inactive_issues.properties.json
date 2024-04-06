@@ -1,13 +1,5 @@
 {
-    "name": "Template Workflo Demo",
+    "name": "Template Workflo Demo CRISTL NEST",
     "description": "Descrizione",
     "iconName": "example-icon",
-    "categories": [
-        "Go"
-    ],
-    "filePatterns": [
-        "package.json$",
-        "^Dockerfile",
-        ".*\\.md$"
-    ]
 }
