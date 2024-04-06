@@ -4,35 +4,35 @@ on:
   workflow_call:
     inputs:
       loader_forge:
-        type: boolean
+        type: string
         description: Forge Loader
         default: false
       loader_fabric:
-        type: boolean
+        type: string
         description: Fabric Loader
         default: false
       loader_neoforge:
-        type: boolean
+        type: string
         description: NeoForge Loader
         default: false
       loader_common:
-        type: boolean
+        type: string
         description: Common Loader
         default: false
       platform_maven:
-        type: boolean
+        type: string
         description: Publish to Maven
         default: false
       platform_github:
-        type: boolean
+        type: string
         description: Publish to GitHub
         default: false
       platform_curseforge:
-        type: boolean
+        type: string
         description: Publish to CurseForge
         default: false
       platform_modrinth:
-        type: boolean
+        type: string
         description: Publish to Modrinth
         default: false
 
