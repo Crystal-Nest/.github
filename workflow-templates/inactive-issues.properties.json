@@ -2,7 +2,7 @@
     "name": "Inactive Issues Organization Workflow",
     "description": "Close inactive issues.",
     "categories": [
-        "Caristal NEST"
+        "Crystal Nest"
     ],
     "filePatterns": [
         "package.json$",
