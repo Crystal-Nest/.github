@@ -10,15 +10,19 @@ on:
       
 
 jobs:
-  call-workflow:
+  call-analyze-workflow:
+    uses: crystal-nest/.github/.github/workflows/analyze.yml@main
+    secrets: inherit 
+  call-version-update-workflow:
     permissions: 
       contents: write
-
     uses: crystal-nest/.github/.github/workflows/version_update.yml@main
     with:
       version: ${{ github.event.inputs.version }}
     secrets: inherit
-    
+  call-release-workflow:
+    permissions: 
+      contents: write
     uses: crystal-nest/.github/.github/workflows/single_release.yml@main
     with:
       loader_forge: true
