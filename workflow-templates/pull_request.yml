@@ -1,0 +1,9 @@
+name: Pull Request Workflow
+
+on:
+  pull_request: 
+
+jobs:
+  call-analyze-workflow:
+    uses: crystal-nest/.github/.github/workflows/analyze.yml@main
+    secrets: inherit 
