@@ -14,7 +14,7 @@ jobs:
     permissions: 
       contents: write
 
-    uses: crystal-nest/.github/.github/workflows/single_release.yml@main
+    uses: crystal-nest/.github/.github/workflows/version_update.yml@main
     with:
       version: ${{ github.event.inputs.version }}
     secrets: inherit
