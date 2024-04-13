@@ -1,12 +1,12 @@
 {
-    "name": "Manual Single Release Workflow",
-    "description": "Allow relese on External Platform.",
-    "categories": [
-        "Crystal Nest"
-    ],
-    "filePatterns": [
-        "package.json$",
-        "^Dockerfile",
-        ".*\\.md$"
-    ]
+  "name": "Single Release Workflow",
+  "description": "Release on selected Platforms.",
+  "categories": [
+    "Crystal Nest"
+  ],
+  "filePatterns": [
+    "package.json$",
+    "^Dockerfile",
+    ".*\\.md$"
+  ]
 }
