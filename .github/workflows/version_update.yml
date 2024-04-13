@@ -1,0 +1,29 @@
+name: Version Update
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        description: Version number
+        required: true
+
+jobs:
+  version_update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Update gradle.properties
+      run: |
+        version_input="${{ github.event.inputs.version }}"
+        sed -i "s/^mod_version = .*/mod_version = $version_input/" gradle.properties
+    - name: Commit changes
+      run: |
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'actions@users.noreply.github.com'
+        git add gradle.properties
+        git commit -m "Update mod_version to ${{ github.event.inputs.version }}"
+        git push
