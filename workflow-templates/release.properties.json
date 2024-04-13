@@ -1,6 +1,6 @@
 {
-    "name": "Version Update Workflow",
-    "description": "Update Version.",
+    "name": "Release Workflow",
+    "description": "Release on all Platform",
     "categories": [
         "Crystal Nest"
     ],
