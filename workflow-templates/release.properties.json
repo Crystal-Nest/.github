@@ -1,12 +1,12 @@
 {
-    "name": "Release Workflow",
-    "description": "Release on all Platform",
-    "categories": [
-        "Crystal Nest"
-    ],
-    "filePatterns": [
-        "package.json$",
-        "^Dockerfile",
-        ".*\\.md$"
-    ]
+  "name": "Release Workflow",
+  "description": "Release on all Platforms",
+  "categories": [
+    "Crystal Nest"
+  ],
+  "filePatterns": [
+    "package.json$",
+    "^Dockerfile",
+    ".*\\.md$"
+  ]
 }
