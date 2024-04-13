@@ -26,4 +26,4 @@ Provide instructions to reproduce, and include your relevant setup.
 # Guidelines:
 
 Please check the element below.  
-- [ ] I have read and thoroughly followed the [contributing guidelines](https://github.com/Crystal-Nest/cobweb-mod-template/blob/master/.github/CONTRIBUTING.md), and my code abides by this project's [code style](https://github.com/Crystal-Nest/cobweb-mod-template/blob/master/.github/CONTRIBUTING.md#code-style).
+- [ ] I have read and thoroughly followed the [contributing guidelines](https://github.com/Crystal-Nest/.github/blob/main/.github/CONTRIBUTING.md), and my code abides by this project's [code style](https://github.com/Crystal-Nest/.github/blob/main/.github/CONTRIBUTING.md#code-style).
