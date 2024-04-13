@@ -1,6 +1,6 @@
 {
-    "name": "Inactive Issues Organization Workflow",
-    "description": "Close inactive issues.",
+    "name": "Manual Single Release Workflow",
+    "description": "Allow relese on External Platform.",
     "categories": [
         "Crystal Nest"
     ],
