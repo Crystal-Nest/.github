@@ -1,1 +1,12 @@
-
+{
+    "name": "Version Update Workflow",
+    "description": "Update Version.",
+    "categories": [
+        "Crystal Nest"
+    ],
+    "filePatterns": [
+        "package.json$",
+        "^Dockerfile",
+        ".*\\.md$"
+    ]
+}
