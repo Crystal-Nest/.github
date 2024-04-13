@@ -1,0 +1,12 @@
+{
+  "name": "Close Inactive Issue Workflow",
+  "description": "Close Inactive Issue Automaticly",
+  "categories": [
+    "Crystal Nest"
+  ],
+  "filePatterns": [
+    "package.json$",
+    "^Dockerfile",
+    ".*\\.md$"
+  ]
+}
