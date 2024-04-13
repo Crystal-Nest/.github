@@ -1,0 +1,12 @@
+{
+  "name": "Pull Request Workflow",
+  "description": "Analyze Pull Request",
+  "categories": [
+    "Crystal Nest"
+  ],
+  "filePatterns": [
+    "package.json$",
+    "^Dockerfile",
+    ".*\\.md$"
+  ]
+}
