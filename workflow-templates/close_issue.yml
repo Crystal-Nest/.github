@@ -6,7 +6,7 @@ on:
      
 jobs:
   call-analyze-workflow:
-  permissions:
+    permissions:
       issues: write
       pull-requests: write
     uses: crystal-nest/.github/.github/workflows/close_issue.yml@main
