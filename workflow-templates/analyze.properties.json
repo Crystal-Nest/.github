@@ -1,1 +1,12 @@
-
+{
+  "name": "Analyze Workflow",
+  "description": "Build and Analyze",
+  "categories": [
+    "Crystal Nest"
+  ],
+  "filePatterns": [
+    "package.json$",
+    "^Dockerfile",
+    ".*\\.md$"
+  ]
+}
