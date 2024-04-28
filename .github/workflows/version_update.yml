@@ -1,3 +1,4 @@
+name: Version Update
 on:
   workflow_call:
     inputs:
