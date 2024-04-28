@@ -1,6 +1,6 @@
 name: Version Update
 on:
-  workflow_call:
+  workworkflow_dispatch:
     inputs:
       version:
         type: string
