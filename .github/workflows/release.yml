@@ -35,6 +35,6 @@ jobs:
         ./gradlew build 
     - name: Set Command Release
       run: |
-        ./gradlew publishAll
+        ./gradlew publishAll --stacktrace
           
           
