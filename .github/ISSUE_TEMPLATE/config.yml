@@ -1,1 +1,5 @@
 blank_issues_enabled: false
+issue_template_config:
+  enforce_organization_templates: true
+  organization_fallback:
+    ISSUE_TEMPLATE: .github/ISSUE_TEMPLATE
