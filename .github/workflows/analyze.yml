@@ -36,6 +36,5 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # Needed for Sonar analysis
       run: |
         ./gradlew wrapper --gradle-version 8.3
-        ./gradlew build 
-        ./gradlew sonar 
-#--stacktrace --debug
+        ./gradlew build --stacktrace
+        ./gradlew sonar --stacktrace
