@@ -3,6 +3,10 @@ name: Single Release Workflow
 on:
   workflow_dispatch:
      inputs:
+      version:
+        type: string
+        description: Version number
+        required: true 
       loader_forge:
         type: boolean
         description: Forge Loader
