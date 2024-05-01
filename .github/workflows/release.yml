@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  single_release:
+  release:
     permissions: 
       contents: write
       packages: write
