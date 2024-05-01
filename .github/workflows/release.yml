@@ -16,6 +16,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+    - name: Pull
+      run: git pull --no-rebase
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
