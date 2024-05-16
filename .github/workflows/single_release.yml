@@ -88,12 +88,12 @@ jobs:
               ./gradlew ${loader}:publish --stacktrace
             fi
             if [ "${{ inputs.platform_github }}" == "true" ]; then
-              ./gradlew ${loader}:githubRelease --stacktrace
+              ./gradlew ${loader}:publishGitHub --stacktrace
             fi
             if [ "${{ inputs.platform_curseforge }}" == "true" ]; then
-              ./gradlew ${loader}:curseforge --stacktrace
+              ./gradlew ${loader}:publishCurseforge --stacktrace
             fi
             if [ "${{ inputs.platform_modrinth }}" == "true" ]; then
-              ./gradlew ${loader}:modrinth --stacktrace
+              ./gradlew ${loader}:publishModrinth --stacktrace
             fi
           done
