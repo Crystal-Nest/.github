@@ -2,11 +2,15 @@ name: Release Workflow
 
 on:
   workflow_dispatch:
-     inputs:
+    inputs:
       version:
         type: string
         description: Version number
-        required: true   
+        required: true
+      enable_version_checks:
+        type: boolean
+        description: Enable version consistency checks
+        default: true  # Checkbox is checked by default
 
 jobs:
   call-analyze-workflow:
@@ -19,6 +23,7 @@ jobs:
     uses: crystal-nest/.github/.github/workflows/version_update.yml@main
     with:
       version: ${{ github.event.inputs.version }}
+      disable_checks: ${{ not github.event.inputs.enable_version_checks }}
     secrets: inherit
   call-release-workflow:
     needs: [call-analyze-workflow, call-version-update-workflow]
@@ -27,3 +32,4 @@ jobs:
       packages: write
     uses: crystal-nest/.github/.github/workflows/release.yml@main
     secrets: inherit
+
