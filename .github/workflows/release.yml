@@ -33,7 +33,7 @@ jobs:
       run: chmod +x ./gradlew
     - name: Build
       run: |
-        ./gradlew wrapper --gradle-version 8.3
+        ./gradlew wrapper
         ./gradlew build 
     - name: Set Command Release
       run: |
