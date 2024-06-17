@@ -35,6 +35,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to create releases
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # Needed for Sonar analysis
       run: |
-        ./gradlew wrapper --gradle-version 8.3
+        ./gradlew wrapper
         ./gradlew build --stacktrace
         ./gradlew sonar --stacktrace
