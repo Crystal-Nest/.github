@@ -1,1 +1,93 @@
+name: Version Validation
 
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: 'The version to validate (format: {number}.{number}.{number}[-alpha|-beta])'
+        type: string
+        required: true
+      disable_checks:
+        description: 'Flag to disable version checks'
+        type: string
+        required: true
+        default: false
+
+jobs:
+  validate-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Validate version format
+        if: github.event.inputs.disable_checks == 'false'
+        run: |
+          # Validate version format
+          echo "${{ github.event.inputs.disable_checks }}"
+          VERSION_REGEX='^[0-9]+\.[0-9]+\.[0-9]+(-alpha|-beta)?$'
+          if [[ ! "${{ github.event.inputs.version }}" =~ $VERSION_REGEX ]]; then
+            echo "Error: Version format is incorrect. Expected format: {number}.{number}.{number}[-alpha|-beta]"
+            exit 1
+          fi
+      - name: Check if version has changed
+        id: check_version
+        if: github.event.inputs.disable_checks == 'false'
+        run: |
+          version_input="${{ github.event.inputs.version }}"
+          current_version=$(grep -oP '^mod_version = \K.*' gradle.properties)
+          echo "Current version: $current_version"
+          echo "Input version: $version_input"
+          if [ "$version_input" = "$current_version" ]; then
+            echo "Error Version is the same. Exiting."
+            exit 1
+          else
+            echo "Version can changed."
+          fi
+      - name: Perform non-regression checks
+        if: github.event.inputs.disable_checks == 'false'
+        run: |
+          echo "Performing non-regression checks for version ${{ github.event.inputs.version }}..."
+          version_input="${{ github.event.inputs.version }}"
+          current_version=$(grep -oP '^mod_version = \K.*' gradle.properties)
+          
+          current_major=$(echo "$current_version" | cut -d. -f1)
+          current_minor=$(echo "$current_version" | cut -d. -f2)
+          current_patch=$(echo "$current_version" | cut -d. -f3 | sed 's/[^0-9].*//')
+
+          input_major=$(echo "$version_input" | cut -d. -f1)
+          input_minor=$(echo "$version_input" | cut -d. -f2)
+          input_patch=$(echo "$version_input" | cut -d. -f3 | sed 's/[^0-9].*//')
+
+          current_suffix=$(echo "$current_version" | grep -oP '(-alpha|-beta)?$')
+          input_suffix=$(echo "$version_input" | grep -oP '(-alpha|-beta)?$')
+
+          if [ "$input_major" -lt "$current_major" ]; then
+            echo "Error: Major version cannot be decreased."
+            exit 1
+          elif [ "$input_major" -eq "$current_major" ] && [ "$input_minor" -lt "$current_minor" ]; then
+            echo "Error: Minor version cannot be decreased."
+            exit 1
+          elif [ "$input_major" -eq "$current_major" ] && [ "$input_minor" -eq "$current_minor" ] && [ "$input_patch" -lt "$current_patch" ]; then
+            echo "Error: Patch version cannot be decreased."
+            exit 1
+          elif [ "$current_suffix" = "-beta" ] && [ "$input_suffix" = "-alpha" ]; then
+            echo "Error: Cannot downgrade from beta to alpha."
+            exit 1
+          elif [ "$input_major" -eq "$current_major" ] && [ "$input_minor" -eq "$current_minor" ] && [ "$input_patch" -eq "$current_patch" ]; then
+            if [ -z "$current_suffix" ] && [ -n "$input_suffix" ]; then
+              echo "Error: Cannot change from a stable version to a pre-release version."
+              exit 1
+            elif [ "$current_suffix" = "-beta" ] && [ "$input_suffix" = "-alpha" ]; then
+              echo "Error: Cannot downgrade from beta to alpha."
+              exit 1
+            elif [ -n "$current_suffix" ] && [ -z "$input_suffix" ]; then
+              echo "Error: Cannot change from a pre-release version to a stable version."
+              exit 1
+            fi
+          else
+            echo "Version change is valid."
+          fi
+      - name: Report validation status
+        run: |
+          echo "Version validation completed successfully."
