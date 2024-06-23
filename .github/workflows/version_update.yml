@@ -15,21 +15,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Check if version has changed
-        id: check_version
-        run: |
-          version_input="${{ github.event.inputs.version }}"
-          current_version=$(grep -oP '^mod_version = \K.*' gradle.properties)
-          echo "Current version: $current_version"
-          echo "Input version: $version_input"
-          if [ "$version_input" = "$current_version" ]; then
-            echo "Version is the same. Exiting gracefully."
-            echo "::set-output name=outcome::no_changes"
-            exit 0
-          else
-            echo "Version has changed."
-            echo "::set-output name=outcome::version_changed"
-          fi
       - name: Update gradle.properties
         if: steps.check_version.outputs.outcome == 'version_changed'  # Only execute if version has changed
         run: |
