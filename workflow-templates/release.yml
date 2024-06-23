@@ -7,40 +7,38 @@ on:
         type: string
         description: Version number
         required: true
-      enable_version_checks:
+      disable_checks:
         type: boolean
-        description: Enable version consistency checks
-        default: true  # Checkbox is checked by default
+        description: Disable version consistency checks
+        default: false  # Checkbox is checked by default
 
 jobs:
   call-version-validation-workflow:
-    runs-on: ubuntu-latest
-    uses: ./.github/workflows/version_validation.yml
+    permissions:
+      contents: write
+    uses: crystal-nest/.github/.github/workflows/version_validation.yml@main  # Correct path to the reusable workflow
     with:
       version: ${{ github.event.inputs.version }}
-      disable_checks: ${{ not github.event.inputs.enable_version_checks }}
-
+      disable_checks: ${{ github.event.inputs.disable_checks }}
+    secrets: inherit
   call-analyze-workflow:
     needs: call-version-validation-workflow
-    if: needs.call-version-validation-workflow.outputs.outcome != 'no_changes' && needs.call-version-validation-workflow.outputs.outcome != 'checks_disabled'
+    permissions:
+      contents: read
     uses: crystal-nest/.github/.github/workflows/analyze.yml@main
     secrets: inherit 
-
   call-version-update-workflow:
-    needs: [call-version-validation-workflow, call-analyze-workflow]
-    if: needs.call-version-validation-workflow.outputs.outcome == 'version_changed' || needs.call-version-validation-workflow.outputs.outcome == 'checks_disabled'
+    needs: call-analyze-workflow
     permissions: 
       contents: write
     uses: crystal-nest/.github/.github/workflows/version_update.yml@main
     with:
       version: ${{ github.event.inputs.version }}
     secrets: inherit
-
   call-release-workflow:
     needs: [call-analyze-workflow, call-version-update-workflow]
-    if: needs.call-version-validation-workflow.outputs.outcome == 'version_changed' || needs.call-version-validation-workflow.outputs.outcome == 'checks_disabled'
     permissions: 
       contents: write
-      packages: write
+      packages: write  # Change to 'none' instead of 'write' for packages
     uses: crystal-nest/.github/.github/workflows/release.yml@main
     secrets: inherit
