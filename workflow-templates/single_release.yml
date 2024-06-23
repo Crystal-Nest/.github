@@ -48,7 +48,7 @@ jobs:
   call-version-validation-workflow:
     permissions:
       contents: write
-    uses: crystal-nest/.github/.github/workflows/version_validation.yml  # Correct path to the reusable workflow
+    uses: crystal-nest/.github/.github/workflows/version_validation.yml@main  # Correct path to the reusable workflow
     with:
       version: ${{ github.event.inputs.version }}
       disable_checks: ${{ github.event.inputs.disable_checks }}
