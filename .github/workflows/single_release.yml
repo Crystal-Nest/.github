@@ -1,83 +1,99 @@
 name: Single Release Workflow
 
 on:
-  workflow_dispatch:
-     inputs:
-      version:
-        type: string
-        description: Version number
-        required: true 
-      disable_checks:
-        type: boolean
-        description: Disable version consistency checks
-        default: false  # Checkbox is checked by default
+  workflow_call:
+    inputs:
       loader_forge:
-        type: boolean
+        type: string
         description: Forge Loader
         default: false
       loader_fabric:
-        type: boolean
+        type: string
         description: Fabric Loader
         default: false
       loader_neoforge:
-        type: boolean
+        type: string
         description: NeoForge Loader
         default: false
       loader_common:
-        type: boolean
+        type: string
         description: Common Loader
         default: false
       platform_maven:
-        type: boolean
+        type: string
         description: Publish to Maven
         default: false
       platform_github:
-        type: boolean
+        type: string
         description: Publish to GitHub
         default: false
       platform_curseforge:
-        type: boolean
+        type: string
         description: Publish to CurseForge
         default: false
       platform_modrinth:
-        type: boolean
+        type: string
         description: Publish to Modrinth
-        default: false 
+        default: false
 
 jobs:
-  call-version-validation-workflow:
-    permissions:
-      contents: write
-    uses: crystal-nest/.github/.github/workflows/version_validation.yml@main  # Correct path to the reusable workflow
-    with:
-      version: ${{ github.event.inputs.version }}
-      disable_checks: ${{ github.event.inputs.disable_checks }}
-    secrets: inherit
-  call-analyze-workflow:
-    needs: call-version-validation-workflow
-    uses: crystal-nest/.github/.github/workflows/analyze.yml@main
-    secrets: inherit 
-  call-version-update-workflow:
-    needs: call-analyze-workflow
-    permissions: 
-      contents: write
-    uses: crystal-nest/.github/.github/workflows/version_update.yml@main
-    with:
-      version: ${{ github.event.inputs.version }}
-    secrets: inherit
-  call-release-workflow:
-    needs: [call-analyze-workflow, call-version-update-workflow]
+  single_release:
     permissions: 
       contents: write
       packages: write
-    uses: crystal-nest/.github/.github/workflows/single_release.yml@main
-    with:
-      loader_forge: ${{ github.event.inputs.loader_forge }}
-      loader_fabric: ${{ github.event.inputs.loader_fabric }}
-      loader_neoforge: ${{ github.event.inputs.loader_neoforge }}
-      loader_common: ${{ github.event.inputs.loader_common }}
-      platform_maven: ${{ github.event.inputs.platform_maven }}
-      platform_github: ${{ github.event.inputs.platform_github }}
-      platform_curseforge: ${{ github.event.inputs.platform_curseforge }}
-      platform_modrinth: ${{ github.event.inputs.platform_modrinth }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+      CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Pull
+      run: git pull --no-rebase
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: 17
+        distribution: 'zulu' # Alternative distribution options are available
+    - name: Cache Gradle packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+        restore-keys: ${{ runner.os }}-gradle
+    - name: Set permission
+      run: chmod +x ./gradlew
+    - name: Build
+      run: |
+        ./gradlew wrapper
+        ./gradlew build 
+    - name: Set Command
+      run: |
+          loaders=()
+          if [ "${{ inputs.loader_forge }}" == "true" ]; then
+            loaders+=("forge")
+          fi
+          if [ "${{ inputs.loader_fabric }}" == "true" ]; then
+            loaders+=("fabric")
+          fi
+          if [ "${{ inputs.loader_neoforge }}" == "true" ]; then
+            loaders+=("neoforge")
+          fi
+          if [ "${{ inputs.loader_common }}" == "true" ]; then
+            loaders+=("common")
+          fi
+          for loader in "${loaders[@]}"; do
+            if [ "${{ inputs.platform_maven }}" == "true" ]; then
+              ./gradlew ${loader}:publish --stacktrace
+            fi
+            if [ "${{ inputs.platform_github }}" == "true" ]; then
+              ./gradlew ${loader}:publishGitHub --stacktrace
+            fi
+            if [ "${{ inputs.platform_curseforge }}" == "true" ]; then
+              ./gradlew ${loader}:publishCurseforge --stacktrace
+            fi
+            if [ "${{ inputs.platform_modrinth }}" == "true" ]; then
+              ./gradlew ${loader}:publishModrinth --stacktrace
+            fi
+          done
