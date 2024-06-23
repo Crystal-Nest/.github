@@ -3,14 +3,14 @@ name: Single Release Workflow
 on:
   workflow_dispatch:
      inputs:
-      version:
-        type: string
-        description: Version number
-        required: true 
-      disable_checks:
-        type: boolean
-        description: Disable version consistency checks
-        default: false  # Checkbox is checked by default
+#      version:
+#        type: string
+#        description: Version number
+#        required: true 
+#      disable_checks:
+#        type: boolean
+#        description: Disable version consistency checks
+#        default: false  # Checkbox is checked by default
       loader_forge:
         type: boolean
         description: Forge Loader
@@ -45,16 +45,16 @@ on:
         default: false 
 
 jobs:
-  call-version-validation-workflow:
-    permissions:
-      contents: write
-    uses: crystal-nest/.github/.github/workflows/version_validation.yml@main  # Correct path to the reusable workflow
-    with:
-      version: ${{ github.event.inputs.version }}
-      disable_checks: ${{ github.event.inputs.disable_checks }}
-    secrets: inherit
+#  call-version-validation-workflow:
+#    permissions:
+#      contents: write
+#    uses: crystal-nest/.github/.github/workflows/version_validation.yml@main  # Correct path to the reusable workflow
+#    with:
+#      version: ${{ github.event.inputs.version }}
+#      disable_checks: ${{ github.event.inputs.disable_checks }}
+#    secrets: inherit
   call-analyze-workflow:
-    needs: call-version-validation-workflow
+#    needs: call-version-validation-workflow
     uses: crystal-nest/.github/.github/workflows/analyze.yml@main
     secrets: inherit 
   call-version-update-workflow:
