@@ -1,4 +1,4 @@
-name: Close inactive issue
+name: Close Inactive Issues
 on:
   workflow_call:
 
