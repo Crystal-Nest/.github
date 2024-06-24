@@ -19,13 +19,28 @@ jobs:
           sparse-checkout: |
             gradle.properties
           sparse-checkout-cone-mode: false
+      - name: Check if version has changed
+        id: check_version
+        run: |
+          version_input = "${{ github.event.inputs.version }}"
+          current_version = $(grep -oP '^mod_version = \K.*' gradle.properties)
+          echo "Current version: $current_version"
+          echo "Input version: $version_input"
+          if [ "$version_input" = "$current_version" ]; then
+            echo "Version is already up to date."
+            echo "::set-output name=outcome::no_changes"
+            exit 0
+          else
+            echo "Versions are different."
+            echo "::set-output name=outcome::version_changed"
+          fi
       - name: Update gradle.properties
-        if: steps.check_version.outputs.outcome == 'version_changed'  # Only execute if version has changed
+        if: steps.check_version.outputs.outcome == 'version_changed'
         run: |
           version_input="${{ github.event.inputs.version }}"
           sed -i "s/^mod_version = .*/mod_version = $version_input/" gradle.properties
       - name: Commit and push changes
-        if: steps.check_version.outputs.outcome == 'version_changed'  # Only execute if version has changed
+        if: steps.check_version.outputs.outcome == 'version_changed'
         run: |
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'actions@users.noreply.github.com'
