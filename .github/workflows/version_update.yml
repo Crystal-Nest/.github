@@ -22,8 +22,8 @@ jobs:
       - name: Check if version has changed
         id: check_version
         run: |
-          version_input = "${{ github.event.inputs.version }}"
-          current_version = $(grep -oP '^mod_version = \K.*' gradle.properties)
+          version_input="${{ github.event.inputs.version }}"
+          current_version=$(grep -oP '^mod_version = \K.*' gradle.properties)
           echo "Current version: $current_version"
           echo "Input version: $version_input"
           if [ "$version_input" = "$current_version" ]; then
