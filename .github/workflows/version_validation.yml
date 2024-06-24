@@ -37,8 +37,8 @@ jobs:
         id: check_version
         if: github.event.inputs.disable_checks == 'false'
         run: |
-          version_input = "${{ github.event.inputs.version }}"
-          current_version = $(grep -oP '^mod_version = \K.*' gradle.properties)
+          version_input="${{ github.event.inputs.version }}"
+          current_version=$(grep -oP '^mod_version = \K.*' gradle.properties)
           echo "Current version: $current_version"
           echo "Input version: $version_input"
           if [ "$version_input" = "$current_version" ]; then
@@ -51,16 +51,16 @@ jobs:
         if: github.event.inputs.disable_checks == 'false'
         run: |
           echo "Performing non-regression checks for version ${{ github.event.inputs.version }}..."
-          version_input = "${{ github.event.inputs.version }}"
-          current_version = $(grep -oP '^mod_version = \K.*' gradle.properties)
-          current_major = $(echo "$current_version" | cut -d. -f1)
-          current_minor = $(echo "$current_version" | cut -d. -f2)
-          current_patch = $(echo "$current_version" | cut -d. -f3 | sed 's/[^0-9].*//')
-          input_major = $(echo "$version_input" | cut -d. -f1)
-          input_minor = $(echo "$version_input" | cut -d. -f2)
-          input_patch = $(echo "$version_input" | cut -d. -f3 | sed 's/[^0-9].*//')
-          current_suffix = $(echo "$current_version" | grep -oP '(-alpha|-beta)?$')
-          input_suffix = $(echo "$version_input" | grep -oP '(-alpha|-beta)?$')
+          version_input="${{ github.event.inputs.version }}"
+          current_version=$(grep -oP '^mod_version = \K.*' gradle.properties)
+          current_major=$(echo "$current_version" | cut -d. -f1)
+          current_minor=$(echo "$current_version" | cut -d. -f2)
+          current_patch=$(echo "$current_version" | cut -d. -f3 | sed 's/[^0-9].*//')
+          input_major=$(echo "$version_input" | cut -d. -f1)
+          input_minor=$(echo "$version_input" | cut -d. -f2)
+          input_patch=$(echo "$version_input" | cut -d. -f3 | sed 's/[^0-9].*//')
+          current_suffix=$(echo "$current_version" | grep -oP '(-alpha|-beta)?$')
+          input_suffix=$(echo "$version_input" | grep -oP '(-alpha|-beta)?$')
           if [ "$input_major" -lt "$current_major" ]; then
             echo "Error: Major version cannot be decreased."
             exit 1
