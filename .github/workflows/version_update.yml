@@ -14,7 +14,11 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            gradle.properties
+          sparse-checkout-cone-mode: false
       - name: Update gradle.properties
         if: steps.check_version.outputs.outcome == 'version_changed'  # Only execute if version has changed
         run: |
