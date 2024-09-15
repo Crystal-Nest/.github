@@ -1,0 +1,12 @@
+{
+  "name": "Remove Labels From Closed Items Workflow",
+  "description": "Removes certain labels from closed issues and PRs automatically",
+  "categories": [
+    "Crystal Nest"
+  ],
+  "filePatterns": [
+    "package.json$",
+    "^Dockerfile",
+    ".*\\.md$"
+  ]
+}
