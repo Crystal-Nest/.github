@@ -1,0 +1,17 @@
+name: Remove Labels Workflow
+
+on:
+  issues:
+    types: [closed]
+
+permissions:
+  issues: write
+
+jobs:
+  label_issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove labels
+        uses: andymckay/labeler@1.0.4
+        with:
+          remove-labels: "highest priority, high priority, medium priority, low priority, no priority, pending"
