@@ -1,6 +1,6 @@
 {
-  "name": "Close Inactive Issue Workflow",
-  "description": "Close Inactive Issue Automaticly",
+  "name": "Close Inactive Issues Workflow",
+  "description": "Closes inactive issue automatically",
   "categories": [
     "Crystal Nest"
   ],
