@@ -16,8 +16,8 @@ We also plan on expanding our community with different ways to engage with it.
 
 ## Useful resources
 
-We currently have our own website, which can be found [here](https://crystalnest.it), albeit it's still a work in progress.  
-Nonetheless, for fellow mod developers, the website already offers the option to download an up-to-date customizable template for a multiloader mod!  
+We currently have our own website, which can be found [here](https://crystalnest.it).  
+It offers an easy way to check out all of our mods and, for fellow mod developers, the option to download an up-to-date customizable template for a multiloader mod!  
 
 Some of our mods come with a wiki accessible from the respective mod's GitHub page.
 
