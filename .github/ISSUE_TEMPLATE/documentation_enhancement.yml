@@ -10,7 +10,8 @@ body:
     options:
     - label: I have searched for existing issues
       required: true
-- type: input
+- id: section
+  type: input
   attributes:
     label: What needs an update
     description: |
