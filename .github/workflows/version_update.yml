@@ -28,11 +28,11 @@ jobs:
           echo "Input version: $version_input"
           if [ "$version_input" = "$current_version" ]; then
             echo "Version is already up to date."
-            echo "::set-output name=outcome::no_changes"
+            echo "outcome=no_changes" >> $GITHUB_OUTPUT
             exit 0
           else
             echo "Versions are different."
-            echo "::set-output name=outcome::version_changed"
+            echo "outcome=version_change" >> $GITHUB_OUTPUT
           fi
       - name: Update gradle.properties
         if: steps.check_version.outputs.outcome == 'version_changed'
