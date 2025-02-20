@@ -35,12 +35,12 @@ jobs:
             echo "outcome=version_change" >> $GITHUB_OUTPUT
           fi
       - name: Update gradle.properties
-        if: steps.check_version.outputs.outcome == 'version_changed'
+        if: steps.check_version.outputs.outcome == 'version_change'
         run: |
           version_input="${{ github.event.inputs.version }}"
           sed -i "s/^mod_version = .*/mod_version = $version_input/" gradle.properties
       - name: Commit and push changes
-        if: steps.check_version.outputs.outcome == 'version_changed'
+        if: steps.check_version.outputs.outcome == 'version_change'
         run: |
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'actions@users.noreply.github.com'
