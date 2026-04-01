@@ -71,9 +71,6 @@ jobs:
     - name: Set Command
       run: |
           loaders=()
-          if [ "${{ inputs.loader_forge }}" == "true" ]; then
-            loaders+=("forge")
-          fi
           if [ "${{ inputs.loader_fabric }}" == "true" ]; then
             loaders+=("fabric")
           fi
