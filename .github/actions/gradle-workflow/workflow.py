@@ -8,6 +8,8 @@ import re
 import subprocess
 import sys
 import tempfile
+from urllib.parse import urlencode, urlsplit
+from urllib.request import Request, urlopen
 
 
 VERSION = re.compile(r"([0-9]+)\.([0-9]+)\.([0-9]+)(?:-(alpha|beta))?")
@@ -23,8 +25,19 @@ def flag(name):
     return value == "true"
 
 
-def run(args, *, capture=False, env=None):
+def run(args, *, capture=False, env=None, record=False):
     print("+ " + " ".join(map(str, args)), flush=True)
+    if record:
+        # Keep Sonar output visible while retaining the failure reason. A timeout
+        # or scanner error must never be mistaken for a completed gate of NONE.
+        with subprocess.Popen(args, text=True, encoding="utf-8", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env) as process:
+            lines = []
+            for line in process.stdout:
+                print(line, end="", flush=True)
+                lines.append(line)
+            if process.wait():
+                raise subprocess.CalledProcessError(process.returncode, args, output="".join(lines))
+        return
     result = subprocess.run(args, check=True, text=True, encoding="utf-8", stdout=subprocess.PIPE if capture else None, env=env)
     return result.stdout.strip() if capture else None
 
@@ -132,7 +145,7 @@ def push_version(base_sha, ref):
 
 def gradle(*args, env=None):
     # Workflows run on Ubuntu. Tests can supply a Gradle runner directly to execute().
-    run(["./gradlew", *args, "--stacktrace", "--console=plain"], env=env)
+    run(["./gradlew", *args, "--stacktrace", "--console=plain"], env=env, record=args[0] == "sonar")
 
 
 def artifacts():
@@ -151,12 +164,47 @@ def verify_artifacts(expected):
         raise ValueError("Release artifacts changed after the build; refusing to continue")
 
 
+def sonar_gate_status(metadata):
+    """Read the completed gate for this scan, never the branch's latest scan."""
+    try:
+        report = dict(line.split("=", 1) for line in metadata.read_text(encoding="utf-8").splitlines() if "=" in line)
+        server = report["serverUrl"].rstrip("/")
+        parsed = urlsplit(server)
+        if parsed.scheme != "https" or not parsed.netloc or parsed.username or parsed.password or parsed.query or parsed.fragment:
+            raise ValueError("Invalid Sonar server URL")
+
+        def get(endpoint, **query):
+            request = Request(server + "/api/" + endpoint + "?" + urlencode(query), headers={"Authorization": "Bearer " + os.environ["SONAR_TOKEN"]})
+            with urlopen(request, timeout=30) as response:
+                return json.load(response)
+
+        task = get("ce/task", id=report["ceTaskId"])["task"]
+        if task["status"] != "SUCCESS" or not task.get("analysisId"):
+            return None
+        return get("qualitygates/project_status", analysisId=task["analysisId"])["projectStatus"]["status"]
+    except (OSError, ValueError, KeyError, TypeError):
+        print("Could not confirm a completed Sonar quality gate; the original failure is preserved.", flush=True)
+        return None
+
+
 def analyze(gradle_runner):
     args = ["sonar", "-Dsonar.qualitygate.wait=true"]
     if os.environ.get("GITHUB_EVENT_NAME") != "pull_request":
         args.append("-Dsonar.branch.name=" + os.environ["GITHUB_REF_NAME"])
-    # Fail immediately for every scanner or quality-gate error. Retries are manual.
-    gradle_runner(*args)
+    with tempfile.TemporaryDirectory(prefix="crystal-nest-sonar-", dir=os.environ.get("RUNNER_TEMP")) as temp:
+        metadata = Path(temp) / "report-task.txt"
+        args.append("-Dsonar.scanner.metadataFilePath=" + str(metadata))
+        try:
+            gradle_runner(*args)
+        except subprocess.CalledProcessError as error:
+            # The scanner reports FAILED for NONE too. Check the exact analysis
+            # only after a completed gate failure, excluding scanner errors/timeouts.
+            if "QUALITY GATE STATUS: FAILED" not in (error.output or "") or sonar_gate_status(metadata) != "NONE":
+                raise
+            print("::warning::Sonar quality gate is NONE (not computed). Retrying Sonar once using the existing build.", flush=True)
+            metadata.unlink()
+            # Deliberately outside another handler: every second failure is final.
+            gradle_runner(*args)
 
 
 def summary(sha, tasks, dry_run, jars):

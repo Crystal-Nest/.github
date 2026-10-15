@@ -28,7 +28,7 @@ A release uses one runner and one workspace:
 6. Check that the remote branch still points to the starting commit, then push.
 7. Publish the existing, tested JARs.
 
-There is no pull, merge, rebase, forced push, or automatic retry. If the branch
+There is no pull, merge, rebase, or forced push. If the branch
 changes during a release, rerun against the updated branch. The publication
 initialization script verifies and reuses existing archive outputs; it fails if a
 required archive was not built or its checksum changed. Non-archive tasks such
@@ -41,7 +41,7 @@ loader (`loader_fabric`, `loader_neoforge`, `loader_common`) and one platform
 (`platform_maven`, `platform_github`, `platform_curseforge`, `platform_modrinth`).
 All selection flags are booleans and default to false. Forge is no longer an
 accepted input. The selected publishing tasks run together after one build and
-one Sonar analysis.
+Sonar analysis (with the NONE-only retry described below).
 Common alone requires the Maven platform because its mod-platform tasks are disabled.
 
 Full releases, single releases, and standalone version updates share a concurrency
@@ -60,8 +60,13 @@ upload packages. Publishing tasks are configured with Gradle's `--dry-run`, so
 publishing credentials, platform API responses, and remote publication side
 effects are not tested. A step summary lists the revision, tasks, and JAR hashes.
 
-Sonar failures always stop the run, including the known first-branch case where
-Sonar has no computed quality gate. Retrying is always manual.
+Sonar is retried once automatically only when its completed analysis reports
+quality-gate status `NONE` (not computed), as can happen on a branch's first scan.
+The workflow checks the scanner's gate-failure output and queries Sonar using
+that scan's task and analysis IDs; it never uses the branch's latest result.
+The retry reuses the existing build. A failed gate, scanner error, timeout,
+unavailable status, or any failure on the second attempt stops the run without
+pushing or publishing. This policy also applies to standalone analysis runs.
 
 ## Mod-side build configuration
 
