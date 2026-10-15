@@ -64,6 +64,8 @@ runs:
   - name: Set up Gradle
     if: inputs.operation == 'analyze' || inputs.operation == 'release' || inputs.operation == 'single-release'
     uses: gradle/actions/setup-gradle@v6
+    with:
+      add-job-summary: 'never'
   - name: Cache Sonar packages
     if: inputs.operation == 'analyze' || inputs.operation == 'release' || inputs.operation == 'single-release'
     uses: actions/cache@v5
