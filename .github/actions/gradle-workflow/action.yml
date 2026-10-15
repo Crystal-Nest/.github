@@ -1,0 +1,94 @@
+name: Crystal Nest Gradle workflow
+description: Build, analyze, and publish from one workspace with explicit release inputs
+inputs:
+  operation:
+    description: analyze, release, single-release, validate-version, or update-version
+    required: true
+  java-version:
+    description: JDK version (required for build operations)
+  version:
+    description: Mod version to release
+  disable_checks:
+    description: Disable all version checks, including format validation
+    default: 'false'
+  dry_run:
+    description: Build and analyze without pushing a version commit or publishing releases
+    default: 'false'
+  loader_fabric:
+    description: Fabric Loader
+    default: 'false'
+  loader_neoforge:
+    description: NeoForge Loader
+    default: 'false'
+  loader_common:
+    description: Common Loader
+    default: 'false'
+  platform_maven:
+    description: Publish to Maven
+    default: 'false'
+  platform_github:
+    description: Publish to GitHub
+    default: 'false'
+  platform_curseforge:
+    description: Publish to CurseForge
+    default: 'false'
+  platform_modrinth:
+    description: Publish to Modrinth
+    default: 'false'
+runs:
+  using: composite
+  steps:
+  - name: Validate inputs before setting up the build
+    shell: bash
+    env:
+      CN_OPERATION: ${{ inputs.operation }}
+      CN_JAVA_VERSION: ${{ inputs.java-version }}
+      CN_VERSION: ${{ inputs.version }}
+      CN_DISABLE_CHECKS: ${{ inputs.disable_checks }}
+      CN_DRY_RUN: ${{ inputs.dry_run }}
+      CN_LOADER_FABRIC: ${{ inputs.loader_fabric }}
+      CN_LOADER_NEOFORGE: ${{ inputs.loader_neoforge }}
+      CN_LOADER_COMMON: ${{ inputs.loader_common }}
+      CN_PLATFORM_MAVEN: ${{ inputs.platform_maven }}
+      CN_PLATFORM_GITHUB: ${{ inputs.platform_github }}
+      CN_PLATFORM_CURSEFORGE: ${{ inputs.platform_curseforge }}
+      CN_PLATFORM_MODRINTH: ${{ inputs.platform_modrinth }}
+      CN_ACTION_PATH: ${{ github.action_path }}
+    run: python3 "$CN_ACTION_PATH/workflow.py" check
+  - name: Set up JDK
+    if: inputs.operation == 'analyze' || inputs.operation == 'release' || inputs.operation == 'single-release'
+    uses: actions/setup-java@v5
+    with:
+      java-version: ${{ inputs.java-version }}
+      distribution: microsoft
+  - name: Set up Gradle
+    if: inputs.operation == 'analyze' || inputs.operation == 'release' || inputs.operation == 'single-release'
+    uses: gradle/actions/setup-gradle@v6
+  - name: Cache Sonar packages
+    if: inputs.operation == 'analyze' || inputs.operation == 'release' || inputs.operation == 'single-release'
+    uses: actions/cache@v5
+    with:
+      path: ~/.sonar/cache
+      key: ${{ runner.os }}-sonar-${{ github.run_id }}
+      restore-keys: ${{ runner.os }}-sonar-
+  - name: Make the Gradle wrapper executable
+    if: inputs.operation == 'analyze' || inputs.operation == 'release' || inputs.operation == 'single-release'
+    shell: bash
+    run: chmod +x ./gradlew
+  - name: Run workflow
+    shell: bash
+    env:
+      CN_OPERATION: ${{ inputs.operation }}
+      CN_JAVA_VERSION: ${{ inputs.java-version }}
+      CN_VERSION: ${{ inputs.version }}
+      CN_DISABLE_CHECKS: ${{ inputs.disable_checks }}
+      CN_DRY_RUN: ${{ inputs.dry_run }}
+      CN_LOADER_FABRIC: ${{ inputs.loader_fabric }}
+      CN_LOADER_NEOFORGE: ${{ inputs.loader_neoforge }}
+      CN_LOADER_COMMON: ${{ inputs.loader_common }}
+      CN_PLATFORM_MAVEN: ${{ inputs.platform_maven }}
+      CN_PLATFORM_GITHUB: ${{ inputs.platform_github }}
+      CN_PLATFORM_CURSEFORGE: ${{ inputs.platform_curseforge }}
+      CN_PLATFORM_MODRINTH: ${{ inputs.platform_modrinth }}
+      CN_ACTION_PATH: ${{ github.action_path }}
+    run: python3 "$CN_ACTION_PATH/workflow.py"

@@ -1,49 +1,32 @@
 name: Version Update
-on:
-  workflow_call:  
+'on':
+  workflow_call:
     inputs:
       version:
+        description: Mod version to release
         type: string
-        description: Version number
         required: true
-
+      dry_run:
+        description: Build and analyze without pushing a version commit or publishing releases
+        type: boolean
+        default: false
 jobs:
-  version_update:
+  update_version:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    concurrency:
+      group: release-${{ github.ref }}
+      cancel-in-progress: false
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          sparse-checkout: |
-            gradle.properties
-          sparse-checkout-cone-mode: false
-      - name: Check if version has changed
-        id: check_version
-        run: |
-          version_input="${{ github.event.inputs.version }}"
-          current_version=$(grep -oP '^mod_version = \K.*' gradle.properties)
-          echo "Current version: $current_version"
-          echo "Input version: $version_input"
-          if [ "$version_input" = "$current_version" ]; then
-            echo "Version is already up to date."
-            echo "outcome=no_changes" >> $GITHUB_OUTPUT
-            exit 0
-          else
-            echo "Versions are different."
-            echo "outcome=version_change" >> $GITHUB_OUTPUT
-          fi
-      - name: Update gradle.properties
-        if: steps.check_version.outputs.outcome == 'version_change'
-        run: |
-          version_input="${{ github.event.inputs.version }}"
-          sed -i "s/^mod_version = .*/mod_version = $version_input/" gradle.properties
-      - name: Commit and push changes
-        if: steps.check_version.outputs.outcome == 'version_change'
-        run: |
-          git config --global user.name 'GitHub Actions'
-          git config --global user.email 'actions@users.noreply.github.com'
-          git add gradle.properties
-          git commit -m "Update mod_version to ${{ github.event.inputs.version }}"
-          git push
+    - name: Checkout the triggering commit
+      uses: actions/checkout@v6
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 1
+    - name: Version Update
+      uses: Crystal-Nest/.github/.github/actions/gradle-workflow@main
+      with:
+        operation: update-version
+        version: ${{ inputs.version }}
+        dry_run: ${{ inputs.dry_run }}
