@@ -226,7 +226,6 @@ def execute(operation, gradle_runner=gradle):
         gradle_runner("build")
         analyze(gradle_runner)
         return
-    ensure_clean()
     ref = release_ref()
     base_sha = git("rev-parse", "HEAD", capture=True)
     sha = prepare_version(os.environ["CN_VERSION"]) if operation in ("release", "update-version") else base_sha

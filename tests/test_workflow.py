@@ -241,6 +241,14 @@ class Release(unittest.TestCase):
             workflow.execute('release', failed)
         self.assertEqual(self.remote_sha(), self.original)
 
+    def test_dirty_checkout_is_checked_after_analysis_before_publication(self):
+        os.environ['CN_DRY_RUN'] = 'false'
+        Path('.gitignore').write_text('build/\n# changed during setup\n', encoding='utf-8')
+        with self.assertRaises(subprocess.CalledProcessError):
+            workflow.execute('release', self.gradle)
+        self.assertEqual([args[0] for args in self.calls], ['build', 'sonar'])
+        self.assertEqual(self.remote_sha(), self.original)
+
     def test_changed_jar_stops_before_push(self):
         os.environ['CN_DRY_RUN'] = 'false'
         def tampered(*args):
