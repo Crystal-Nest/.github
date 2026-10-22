@@ -12,7 +12,7 @@ inputs:
     description: Disable all version checks, including format validation
     default: 'false'
   dry_run:
-    description: Build and analyze without pushing a version commit or publishing releases
+    description: Dry run
     default: 'false'
   loader_fabric:
     description: Fabric Loader

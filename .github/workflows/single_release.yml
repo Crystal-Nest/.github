@@ -7,7 +7,7 @@ name: Single Release Workflow
         type: string
         required: true
       dry_run:
-        description: Build and analyze without pushing a version commit or publishing releases
+        description: Dry run
         type: boolean
         default: false
       loader_fabric:
