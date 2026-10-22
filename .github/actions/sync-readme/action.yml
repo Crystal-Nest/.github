@@ -1,0 +1,25 @@
+name: Sync Modrinth README
+description: Publish the default branch README as the Modrinth project body
+inputs:
+  modrinth-project-id:
+    description: Modrinth project ID or slug; defaults to modrinth_id, then mod_id_kebab
+    default: ''
+  curseforge-project-id:
+    description: Reserved CurseForge project ID; defaults to curseforge_id (no CurseForge upload)
+    default: ''
+  dry_run:
+    description: Preview the prepared description without calling the Modrinth API
+    default: 'false'
+runs:
+  using: composite
+  steps:
+  - name: Prepare and sync README
+    shell: bash
+    env:
+      CN_ACTION_PATH: ${{ github.action_path }}
+      CN_MODRINTH_PROJECT_ID: ${{ inputs.modrinth-project-id }}
+      CN_CURSEFORGE_PROJECT_ID: ${{ inputs.curseforge-project-id }}
+      CN_DRY_RUN: ${{ inputs.dry_run }}
+    run: |
+      export CN_README_SHA="$(git rev-parse HEAD)"
+      python3 "$CN_ACTION_PATH/sync_readme.py"
