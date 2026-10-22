@@ -29,10 +29,11 @@ A release uses one runner and one workspace:
 7. Publish the existing, tested JARs.
 
 There is no pull, merge, rebase, or forced push. If the branch
-changes during a release, rerun against the updated branch. The publication
-initialization script verifies and reuses existing archive outputs; it fails if a
-required archive was not built or its checksum changed. Non-archive tasks such
-as publication metadata generation still run normally.
+changes during a release, rerun against the updated branch. Build and publication
+use the same workspace and inputs, so Gradle's normal up-to-date checks reuse
+existing JARs. Gradle controls archive-task execution without workflow overrides.
+JAR checksums are verified after analysis, after configuring publication, and
+after publication. Publication metadata tasks still run normally.
 
 ## Single releases
 

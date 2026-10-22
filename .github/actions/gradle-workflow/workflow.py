@@ -243,19 +243,14 @@ def execute(operation, gradle_runner=gradle):
     analyze(gradle_runner)
     verify_artifacts(jars)
     ensure_clean()
-    # Publication uses the exact archives produced by build. The init script checks
-    # their checksums and skips archive tasks instead of regenerating the JARs.
-    with tempfile.TemporaryDirectory(prefix="crystal-nest-release-", dir=os.environ.get("RUNNER_TEMP")) as temp:
-        manifest = Path(temp) / "artifacts.json"
-        manifest.write_text(json.dumps({"root": str(Path.cwd().resolve()), "artifacts": jars}), encoding="utf-8")
-        args = [*tasks, "--init-script", str(Path(__file__).with_name("reuse-artifacts.gradle")), "-DcrystalNestReleaseArtifacts=" + str(manifest)]
-        # Configure the publishing task graph before changing the remote branch.
-        gradle_runner(*args, "--dry-run")
+    # Configure publication before changing the remote branch. Build and publish
+    # share a workspace; Gradle's normal up-to-date checks reuse existing outputs.
+    gradle_runner(*tasks, "--dry-run")
+    verify_artifacts(jars)
+    if not dry_run:
+        push_version(base_sha, ref)
+        gradle_runner(*tasks)
         verify_artifacts(jars)
-        if not dry_run:
-            push_version(base_sha, ref)
-            gradle_runner(*args)
-            verify_artifacts(jars)
     summary(sha, tasks, dry_run, jars)
 
 
