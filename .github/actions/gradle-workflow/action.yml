@@ -73,10 +73,6 @@ runs:
       path: ~/.sonar/cache
       key: ${{ runner.os }}-sonar-${{ github.run_id }}
       restore-keys: ${{ runner.os }}-sonar-
-  - name: Make the Gradle wrapper executable
-    if: inputs.operation == 'analyze' || inputs.operation == 'release' || inputs.operation == 'single-release'
-    shell: bash
-    run: chmod +x ./gradlew
   - name: Run workflow
     shell: bash
     env:

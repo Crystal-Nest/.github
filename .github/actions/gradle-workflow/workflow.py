@@ -145,7 +145,7 @@ def push_version(base_sha, ref):
 
 def gradle(*args, env=None):
     # Workflows run on Ubuntu. Tests can supply a Gradle runner directly to execute().
-    run(["./gradlew", *args, "--stacktrace", "--console=plain"], env=env, record=args[0] == "sonar")
+    run(["sh", "./gradlew", *args, "--stacktrace", "--console=plain"], env=env, record=args[0] == "sonar")
 
 
 def artifacts():

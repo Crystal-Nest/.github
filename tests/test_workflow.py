@@ -4,6 +4,7 @@ import io
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -14,6 +15,28 @@ SOURCE = Path(__file__).resolve().parents[1] / '.github/actions/gradle-workflow/
 spec = importlib.util.spec_from_file_location('workflow', SOURCE)
 workflow = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(workflow)
+
+
+@unittest.skipUnless(shutil.which('sh'), 'A POSIX shell is required')
+class GradleLauncher(unittest.TestCase):
+    def test_non_executable_wrapper_runs_without_permission_or_content_changes(self):
+        with tempfile.TemporaryDirectory() as temp:
+            previous = Path.cwd()
+            os.chdir(temp)
+            try:
+                wrapper = Path('gradlew')
+                content = b'#!/bin/sh\nprintf "%s\\n" "$@" > received-args.txt\n'
+                wrapper.write_bytes(content)
+                wrapper.chmod(0o644)
+                mode = wrapper.stat().st_mode
+                for task in ('build', 'sonar'):
+                    with self.subTest(task=task):
+                        workflow.gradle(task, '-Pliteral=space; $HOME')
+                        self.assertEqual(Path('received-args.txt').read_text().splitlines(), [task, '-Pliteral=space; $HOME', '--stacktrace', '--console=plain'])
+                        self.assertEqual(wrapper.stat().st_mode, mode)
+                        self.assertEqual(wrapper.read_bytes(), content)
+            finally:
+                os.chdir(previous)
 
 
 class Versions(unittest.TestCase):

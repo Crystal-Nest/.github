@@ -10,6 +10,8 @@ with:
 The files in `workflow-templates` use `REQUIRED_JAVA_VERSION` as an explicit
 placeholder. Replace it with the JDK version for the destination branch.
 Java is branch configuration; it is not a manual workflow selector.
+The Ubuntu runner invokes the wrapper as `sh ./gradlew`, so it does not need to
+change executable permissions recorded by the mod branch.
 
 ## Full releases
 
