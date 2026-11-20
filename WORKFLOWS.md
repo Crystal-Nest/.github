@@ -116,6 +116,21 @@ identical archive inputs. Derive publishing Java
 metadata from the mod's `java_version`, and target the checked-out commit SHA
 when creating release tags.
 
+The shared workflow passes `-PreleaseCommit=<sha>` to the publication graph
+check and actual publication. For a full release this is the new version commit;
+for a single release it is the checked-out commit. The original `GITHUB_SHA`
+predates a full release's version commit and must not be used as its tag target.
+Builds and analysis do not receive this property.
+
+Mod build scripts use this optional property without executing Git:
+
+```groovy
+target = providers.gradleProperty("releaseCommit").getOrElse(minecraft_version)
+```
+
+Without the property, manual publication keeps the Minecraft branch target.
+Ordinary imports and builds require neither Git history nor a release property.
+
 `version_validation.yml` and `version_update.yml` remain available independently.
 They consume their declared `inputs`, not the original dispatch event. The full
 release does not call these as separate jobs, preserving its build workspace.
