@@ -249,7 +249,6 @@ def execute(operation, gradle_runner=gradle):
     if not dry_run:
         push_version(base_sha, ref)
         gradle_runner(*tasks)
-        verify_artifacts(jars)
     summary(sha, tasks, dry_run, jars)
 
 

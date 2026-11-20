@@ -272,15 +272,35 @@ class Release(unittest.TestCase):
         self.assertEqual([args[0] for args in self.calls], ['build', 'sonar'])
         self.assertEqual(self.remote_sha(), self.original)
 
-    def test_changed_jar_stops_before_push(self):
-        os.environ['CN_DRY_RUN'] = 'false'
-        def tampered(*args):
-            self.gradle(*args)
-            if args[0] == 'sonar':
-                Path('fabric/build/libs/mod.jar').write_bytes(b'changed')
-        with self.assertRaisesRegex(ValueError, 'artifacts changed'):
-            workflow.execute('release', tampered)
-        self.assertEqual(self.remote_sha(), self.original)
+    def test_changed_jar_stops_before_push_in_both_release_flows(self):
+        os.environ.update(CN_DRY_RUN='false', CN_DISABLE_CHECKS='true', CN_LOADER_FABRIC='true', CN_PLATFORM_MODRINTH='true')
+        for operation, stage in [('release', 'sonar'), ('release', 'configuration'), ('single-release', 'sonar'), ('single-release', 'configuration')]:
+            with self.subTest(operation=operation, stage=stage):
+                self.calls.clear()
+                def tampered(*args):
+                    self.gradle(*args)
+                    if (stage == 'sonar' and args[0] == 'sonar') or (stage == 'configuration' and '--dry-run' in args):
+                        Path('fabric/build/libs/mod.jar').write_bytes(b'changed')
+                with self.assertRaisesRegex(ValueError, 'artifacts changed'):
+                    workflow.execute(operation, tampered)
+                self.assertEqual(self.remote_sha(), self.original)
+                self.assertTrue(all('--dry-run' in args for args in self.calls if args[0].startswith(('publish', ':'))))
+
+    def test_both_release_flows_finish_after_publication_rewrites_an_archive(self):
+        os.environ.update(CN_DRY_RUN='false', CN_LOADER_FABRIC='true', CN_PLATFORM_MODRINTH='true')
+        for operation in ['release', 'single-release']:
+            with self.subTest(operation=operation):
+                self.calls.clear()
+                def publishing(*args):
+                    self.gradle(*args)
+                    if args[0].startswith(('publish', ':')) and '--dry-run' not in args:
+                        Path('fabric/build/libs/mod.jar').write_bytes(b'changed during publication')
+                with patch.object(workflow, 'summary') as summary:
+                    workflow.execute(operation, publishing)
+                summary.assert_called_once()
+                self.assertNotIn('--dry-run', self.calls[-1])
+                self.assertEqual(self.remote_sha(), self.git_call('rev-parse', 'HEAD', cwd=self.repo))
+                self.assertEqual(Path('fabric/build/libs/mod.jar').read_bytes(), b'changed during publication')
 
     def test_single_release_combines_selected_tasks_in_one_invocation(self):
         os.environ.update(CN_LOADER_FABRIC='true', CN_LOADER_NEOFORGE='true', CN_PLATFORM_MAVEN='true', CN_PLATFORM_MODRINTH='true')

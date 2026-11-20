@@ -34,8 +34,9 @@ There is no pull, merge, rebase, or forced push. If the branch
 changes during a release, rerun against the updated branch. Build and publication
 use the same workspace and inputs, so Gradle's normal up-to-date checks reuse
 existing JARs. Gradle controls archive-task execution without workflow overrides.
-JAR checksums are verified after analysis, after configuring publication, and
-after publication. Publication metadata tasks still run normally.
+JAR checksums are verified after analysis and after configuring publication,
+before pushing or uploading. There is no checksum check after publication.
+Publication metadata tasks still run normally.
 
 ## Single releases
 
