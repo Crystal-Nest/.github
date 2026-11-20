@@ -211,7 +211,7 @@ def summary(sha, tasks, dry_run, jars):
   lines = ["## Release dry run" if dry_run else "## Release", "", f"Commit: `{sha}`", "", "Publishing tasks: " + ", ".join(f"`{t}`" for t in tasks), "", "Sonar quality gate: passed.", ""]
   if dry_run:
     lines.extend(["No version commit was pushed and no release was published.", "Gradle's publishing task graph was checked with --dry-run; publishing API calls were not tested.", ""])
-  lines.extend(f"- `{Path(path).relative_to(Path.cwd())}` â€” SHA-256 `{digest}`" for path, digest in jars.items())
+  lines.extend(f"- `{Path(path).relative_to(Path.cwd())}` - SHA-256 `{digest}`" for path, digest in jars.items())
   print("\n".join(lines), flush=True)
   if os.environ.get("GITHUB_STEP_SUMMARY"):
     with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as output:
