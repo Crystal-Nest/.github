@@ -110,8 +110,8 @@ build/analysis dry run remains in place.
 
 ## Mod-side build configuration
 
-Use stable JAR metadata (for example, the checked-out commit's timestamp) so
-separate Gradle invocations have identical archive inputs. Derive publishing Java
+Keep JAR metadata free of build timestamps so separate Gradle invocations have
+identical archive inputs. Derive publishing Java
 metadata from the mod's `java_version`, and target the checked-out commit SHA
 when creating release tags.
 
